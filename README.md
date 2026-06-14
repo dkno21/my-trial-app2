@@ -1,9 +1,9 @@
-# Aplikasi Bukti Konsep
+# Bukti Aplikasi & Konsep
 
-Ini adalah aplikasi Android sederhana yang berbasis pada "Empty Views Activity".
+Base Aplikasi Android sederhana yang telah difork (70%) dan sekarang dapat Anda unduh dengan mudah lalu menggunakannya.
 
 **Detail:**
-- Base original: https://github.com/hextreeio/android-poc-app
+- Thanks to hextreeio selaku penyedia Base ORI🙏: https://github.com/hextreeio/android-poc-app
 
 # Penyelesaian Masalah (Troubleshooting)
 

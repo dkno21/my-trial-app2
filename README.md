@@ -1,20 +1,17 @@
-# Proof of Concept App
+# Aplikasi Bukti Konsep
 
-This is a simple Android app based on the "Empty Views Activity". It includes a few useful Utils 
-classes and a basic layout with a button and debug text output ready to go.
+Ini adalah aplikasi Android sederhana yang berbasis pada "Empty Views Activity".
 
-**How to use:**
- - File > New > Project from Version Control...
- - Repository: https://github.com/hextreeio/android-poc-app
- - Implement your attack
+**Detail:**
+- Base original: https://github.com/hextreeio/android-poc-app
 
-# Troubleshooting
+# Penyelesaian Masalah (Troubleshooting)
 
 ## ActivityNotFoundException
 
-If you encounter the following error when trying to start an activity you know exists, try to add a `<queries>` tag to the Android manifest.
+Jika Anda menemui kesalahan berikut saat mencoba memulai aktivitas yang Anda tahu ada, coba tambahkan `<queries>` tag pada manifest Android.
 ```
-android.content.ActivityNotFoundException: Unable to find explicit activity class {...}; have you declared this activity in your AndroidManifest.xml, or does your intent not match its declared <intent-filter>?
+android.content.ActivityNotFoundException: Tidak dapat menemukan kelas aktivitas eksplisit {...}; apakah Anda sudah mendeklarasikan aktivitas ini di AndroidManifest.xml Anda, atau apakah intent Anda tidak sesuai dengan deklarasinya? <intent-filter>?
 ```
                                                                                                     
 ```xml

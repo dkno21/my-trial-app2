@@ -1,7 +1,6 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    // Tambahkan baris ini
     id("com.google.gms.google-services")
 }
 
@@ -15,48 +14,50 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
-    } // <--- Tutup defaultConfig di sini
+    }
 
-    // compileOptions dan kotlinOptions harus di luar defaultConfig
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+
     kotlinOptions {
         jvmTarget = "17"
     }
-signingConfigs {
+
+    signingConfigs {
         create("release") {
-            // Gunakan System.getenv("NAMA_VARIABEL")
             storeFile = rootProject.file("ryuki-senpai-key.jks")
-            storePassword = System.getenv("satriya12")
-            keyAlias = System.getenv("my_alias")
-            keyPassword = System.getenv("satriya12")
+            // Ini akan mengambil data dari GitHub Secrets
+            storePassword = System.getenv("KEY_STORE_PASSWORD")
+            keyAlias = System.getenv("ALIAS")
+            keyPassword = System.getenv("KEY_PASSWORD")
         }
     }
 
     buildTypes {
         getByName("release") {
             signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = false
         }
     }
 
-android.applicationVariants.all {
-    val variant = this
-    variant.outputs.all {
-        val output = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
-        // Kita beri nama yang konsisten agar mudah dicari
-        output.outputFileName = "MyTrialApp.apk"
+    applicationVariants.all {
+        val variant = this
+        variant.outputs.all {
+            // Memberi nama file output yang rapi
+            val output = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
+            output.outputFileName = "MyTrialApp.apk"
+        }
     }
 }
-
 
 dependencies {
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")
 
-    // Firebase (BOM dan Firestore)
+    // Firebase
     implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
     implementation("com.google.firebase:firebase-firestore")
 }

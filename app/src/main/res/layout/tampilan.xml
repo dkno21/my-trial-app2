@@ -53,37 +53,4 @@
                 android:text="Button 1" />
         </LinearLayout>
     </ScrollView>
-
-</LinearLayout>
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="4"
-        android:fillViewport="true">
-
-        <LinearLayout
-            android:id="@+id/button_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <!-- Initial test button -->
-            <TextView
-                android:id="@+id/textView3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:text="Click on the button to trigger the proof of concept attack" />
-
-            <Button
-                android:id="@+id/button_1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:backgroundTint="#16c1a2"
-                android:text="Button 1"
-                android:textColor="@color/white" />
-
-            <!-- Additional buttons can be added here -->
-        </LinearLayout>
-    </ScrollView>
-
 </LinearLayout>

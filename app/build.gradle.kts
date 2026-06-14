@@ -28,9 +28,10 @@ android {
     signingConfigs {
         create("release") {
             storeFile = rootProject.file("ryuki-senpai-key.jks")
-            storePassword = project.findProperty("satriya12") as String? ?: ""
-            keyAlias = project.findProperty("my-alias") as String? ?: ""
-            keyPassword = project.findProperty("satriya12") as String? ?: ""
+            // Hardcoded untuk memastikan tidak ada salah baca environment
+            storePassword = "satriya12"
+            keyAlias = "my-alias"
+            keyPassword = "satriya12"
         }
     }
 

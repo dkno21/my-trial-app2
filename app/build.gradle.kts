@@ -25,6 +25,22 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+signingConfigs {
+        create("release") {
+            // Mengambil data dari variabel lingkungan (GitHub Secrets)
+            storeFile = rootProject.file("ryuki-senpai-key.jks") // Pastikan file ini ada di root proyek
+            storePassword = System.getenv("satriya12")
+            keyAlias = System.getenv("my_alias")
+            keyPassword = System.getenv("satriya12")
+        }
+    }
+
+    buildTypes {
+        getByName("release") {
+            signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = false 
+        }
+    }
 }
 
 android.applicationVariants.all {

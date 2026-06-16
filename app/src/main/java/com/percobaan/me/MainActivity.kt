@@ -1,55 +1,81 @@
-package com.percobaan.me 
+package com.percobaan.me
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import com.google.firebase.firestore.FirebaseFirestore // Import ditaruh di sini
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.google.firebase.firestore.FirebaseFirestore
 
 class MainActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.tampilan) 
-        getExternalFilesDir(null)
+        setContentView(R.layout.tampilan)
 
-        // 1. Inisialisasi Database
+        // 1. Pemicu Pembuatan Folder Otomatis
+        // Folder akan otomatis terbuat di: Android/data/com.percobaan.me/files/
+        checkAndCreateFolder()
+
+        // 2. Inisialisasi Database
         val db = FirebaseFirestore.getInstance()
 
-        // 2. Definisi elemen
+        // 3. Definisi elemen UI
         val inputTeks = findViewById<EditText>(R.id.inputTeks)
         val btnSimpan = findViewById<Button>(R.id.btnSimpan)
         val btnHapus = findViewById<Button>(R.id.btnHapus)
 
-        // 3. Aksi Tombol Simpan (Menggunakan Update)
- btnSimpan.setOnClickListener {
-    val isiTeks = inputTeks.text.toString()
+        // 4. Aksi Tombol Simpan
+        btnSimpan.setOnClickListener {
+            val isiTeks = inputTeks.text.toString()
 
-    if (isiTeks.isNotEmpty()) {
-        db.collection("users").document("YpabdicodRZLzZ1vVRS5")
-            .update("usage_history", isiTeks)
-            .addOnSuccessListener {
-                // Berhasil: Gabungkan aksi Toast dan Log di sini
-                Log.d("FirebaseTest", "Berhasil terhubung ke Cloud!")
-                Toast.makeText(this, "Berhasil simpan ke Cloud!", Toast.LENGTH_SHORT).show()
-                inputTeks.setText("") 
+            if (isiTeks.isNotEmpty()) {
+                db.collection("users").document("YpabdicodRZLzZ1vVRS5")
+                    .update("usage_history", isiTeks)
+                    .addOnSuccessListener {
+                        Log.d("FirebaseTest", "Berhasil terhubung ke Cloud!")
+                        Toast.makeText(this, "Berhasil simpan ke Cloud!", Toast.LENGTH_SHORT).show()
+                        inputTeks.setText("")
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("FirebaseTest", "Gagal: ${e.message}")
+                        Toast.makeText(this, "Gagal simpan ke Cloud", Toast.LENGTH_SHORT).show()
+                    }
+            } else {
+                Toast.makeText(this, "Teks tidak boleh kosong!", Toast.LENGTH_SHORT).show()
             }
-            .addOnFailureListener { e ->
-                // Gagal: Tampilkan error di Log dan Toast
-                Log.e("FirebaseTest", "Gagal: ${e.message}")
-                Toast.makeText(this, "Gagal simpan ke Cloud", Toast.LENGTH_SHORT).show()
-            }
-    } else {
-        Toast.makeText(this, "Teks tidak boleh kosong!", Toast.LENGTH_SHORT).show()
-    }
-}
+        }
 
-
-        // 4. Aksi Tombol Hapus
+        // 5. Aksi Tombol Hapus
         btnHapus.setOnClickListener {
             inputTeks.setText("")
             Toast.makeText(this, "Teks telah dihapus", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun checkAndCreateFolder() {
+        // Android 11+ (API 30+) tidak butuh izin runtime untuk folder privat aplikasi
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) 
+                != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 100)
+                return
+            }
+        }
+        // Membuat folder privat aplikasi
+        getExternalFilesDir(null)
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 100 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            getExternalFilesDir(null)
         }
     }
 }

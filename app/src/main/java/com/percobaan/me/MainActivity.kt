@@ -1,6 +1,9 @@
 package com.percobaan.me
 
 import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -19,57 +22,52 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Pastikan nama file layout di bawah ini sama dengan file di res/layout/ kamu
         setContentView(R.layout.tampilan)
 
-        // 1. Panggil fungsi folder otomatis saat aplikasi pertama dibuka
+        // 1. Inisialisasi Fitur
         checkAndCreateFolder()
+        createNotificationChannel()
 
-        // 2. Inisialisasi Firebase
+        // 2. Minta Izin Notifikasi (Untuk Android 13+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) 
+                != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), 101)
+            }
+        }
+
+        // 3. Inisialisasi Firebase
         val db = FirebaseFirestore.getInstance()
 
-        // 3. Definisi elemen UI
+        // 4. UI Elements
         val inputTeks = findViewById<EditText>(R.id.inputTeks)
         val btnSimpan = findViewById<Button>(R.id.btnSimpan)
         val btnHapus = findViewById<Button>(R.id.btnHapus)
 
-        // 4. Aksi Tombol Simpan
         btnSimpan.setOnClickListener {
             val isiTeks = inputTeks.text.toString()
-
             if (isiTeks.isNotEmpty()) {
                 db.collection("users").document("YpabdicodRZLzZ1vVRS5")
                     .update("usage_history", isiTeks)
                     .addOnSuccessListener {
-                        Log.d("FirebaseTest", "Berhasil terhubung!")
-                        Toast.makeText(this, "Berhasil simpan ke Cloud!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Berhasil simpan!", Toast.LENGTH_SHORT).show()
                         inputTeks.setText("")
                     }
                     .addOnFailureListener { e ->
-                        Log.e("FirebaseTest", "Gagal: ${e.message}")
-                        Toast.makeText(this, "Gagal simpan: ${e.message}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Gagal: ${e.message}", Toast.LENGTH_SHORT).show()
                     }
             } else {
-                Toast.makeText(this, "Teks tidak boleh kosong!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Teks kosong!", Toast.LENGTH_SHORT).show()
             }
         }
 
-        // 5. Aksi Tombol Hapus
         btnHapus.setOnClickListener {
             inputTeks.setText("")
-            Toast.makeText(this, "Teks telah dihapus", Toast.LENGTH_SHORT).show()
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-    if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) 
-        != PackageManager.PERMISSION_GRANTED) {
-        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), 101)
-    }
         }
     }
 
-    // --- FUNGSI PEMBUAT FOLDER OTOMATIS ---
+    // --- FUNGSI FOLDER ---
     private fun checkAndCreateFolder() {
-        // Untuk Android 11 ke bawah, butuh cek izin manual
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) 
                 != PackageManager.PERMISSION_GRANTED) {
@@ -77,25 +75,30 @@ class MainActivity : AppCompatActivity() {
                 return
             }
         }
-        
-        // Membuat folder privat aplikasi
         val folder = getExternalFilesDir(null)
         if (folder != null && !folder.exists()) {
             folder.mkdirs()
         }
-        
-        // Uji coba membuat file untuk memastikan folder aktif
         try {
             val testFile = File(folder, "init_check.txt")
-            if (!testFile.exists()) {
-                testFile.createNewFile()
-            }
+            if (!testFile.exists()) testFile.createNewFile()
         } catch (e: IOException) {
-            Log.e("FolderTest", "Gagal buat file cek: ${e.message}")
+            Log.e("FolderTest", "Error: ${e.message}")
         }
     }
 
-    // Menangani respon dari user saat izin diminta
+    // --- FUNGSI NOTIFIKASI CHANNEL ---
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = "Update Info"
+            val channel = NotificationChannel("CHANNEL_ID_AERA", name, NotificationManager.IMPORTANCE_DEFAULT).apply {
+                description = "Notifikasi dari Cloud"
+            }
+            val manager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            manager.createNotificationChannel(channel)
+        }
+    }
+
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 100 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
